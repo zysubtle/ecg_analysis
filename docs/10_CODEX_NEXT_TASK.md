@@ -1,4 +1,4 @@
-# M3 Codex Task｜WFDB XQRS Detector Adapter 集成与 RR 输出
+# M4 Codex Task｜CLI 与导出体验完善
 
 ## 0. 执行前必须阅读
 
@@ -17,70 +17,74 @@
 
 当前任务以本文件内容为准。
 
+---
+
 ## 1. 当前里程碑
 
-M3：WFDB XQRS Detector Adapter 集成与 RR 输出。
+M4：CLI 与导出体验完善。
+
+---
 
 ## 2. 已确认 Owner 决策
 
-以下为 Owner 已确认的 S0 决策，不得擅自改变：
+以下 S0 决策不得擅自改变：
 
-1. 采用 **WFDB XQRS** 作为 M3 正式主 detector。
-2. 继续保持 **不保留自研 fallback**。
-3. 最终运行环境允许 **Python 3.11+**，不强制兼容 Python 3.10。
-4. 暂不补充带参考标注的数据集；当前仍只基于 `tests/fixtures/bidmc_01_Signals_4000.csv` 做 smoke test 与工程合理性检查。
-5. 本项目仍然只是研究 / 工程分析工具，不是医疗诊断软件。
+1. 正式主 detector 为 `wfdb_xqrs`。
+2. 不保留自研 fallback。
+3. R 峰检测在 125 Hz 原始 ECG 上完成，再映射到 50 Hz 输出行。
+4. 输入 fixture 固定为 `tests/fixtures/bidmc_01_Signals_4000.csv`。
+5. 输出 CSV 字段必须遵守 `docs/04_IO_CONTRACT.md`。
+6. 项目仅为研究 / 工程分析工具，不是医疗诊断软件。
+7. 当前不做 HR、HRV、PPG IBI、批量处理、完整 GUI、桌面端打包或临床准确性声明。
+
+---
 
 ## 3. 本轮目标
 
-实现正式的 WFDB XQRS detector adapter，并把它接入最小 ECG 分析流程，使项目能够从 BIDMC 示例 CSV 生成符合 IO Contract 的 50 Hz 主输出 CSV。
+在不改变核心算法、detector 策略和 IO Contract 的前提下，完善 CLI 与导出体验，使 M3 已实现的分析流程更适合后续 GUI 调用和工程验收。
 
-本轮完成后，应能够：
+本轮完成后，应做到：
 
-1. 读取 `tests/fixtures/bidmc_01_Signals_4000.csv`；
-2. 对字段名执行 `strip()` 后匹配 `Time [s]`、`II`、`PLETH`；
-3. 验证原始采样率约为 125 Hz；
-4. 在 125 Hz 原始 ECG 上用 WFDB XQRS 检测 R 峰；
-5. 计算 `r_peak_time_s` 与 `rr_ms`；
-6. 将 ECG、PPG 和时间戳同步输出为 50 Hz 序列；
-7. 将 R 峰时间映射到 50 Hz 输出行；
-8. 导出符合 `docs/04_IO_CONTRACT.md` 的 CSV；
-9. 通过基于 fixture 的 smoke test。
+1. CLI 使用方式清晰、错误提示清晰；
+2. 输入 / 输出路径处理更稳健；
+3. 输出 CSV 仍严格符合 IO Contract；
+4. runtime 产物不会进入 PR；
+5. 基于 fixture 的 CLI smoke test 与错误场景测试更完整；
+6. Runbook 中有清晰的 CLI 使用说明。
+
+---
 
 ## 4. 本轮非目标
 
 本轮不做：
 
-1. 不实现完整 GUI；
-2. 不做 HR / HRV 指标；
-3. 不计算 PPG IBI；
-4. 不新增其他主 detector；
-5. 不保留自研 fallback；
-6. 不做临床准确性声明；
-7. 不把单个 CSV 的结果作为总体准确性证明；
-8. 不改变已确认输入 / 输出字段；
-9. 不做批量处理；
-10. 不做桌面端打包。
+1. 不改变 `wfdb_xqrs` detector 方案；
+2. 不修改 R 峰检测算法参数，除非只是为了修复明确 bug；
+3. 不改变输出 CSV 字段；
+4. 不新增 `hr_bpm`、HRV 或医疗诊断字段；
+5. 不实现完整 GUI；
+6. 不做批量处理；
+7. 不做桌面端打包；
+8. 不新增参考标注准确性评估；
+9. 不提交 `outputs/` 下的运行产物。
+
+---
 
 ## 5. 允许修改范围
 
 允许新增或修改：
 
-- `ecg_rr_tool/detectors/base.py`
-- `ecg_rr_tool/detectors/factory.py`
-- `ecg_rr_tool/detectors/wfdb_detector.py`
 - `ecg_rr_tool/cli.py`
-- `ecg_rr_tool/` 下必要的数据读取、预处理、分析、导出模块，例如：
-  - `ecg_rr_tool/io.py`
-  - `ecg_rr_tool/preprocess.py`
-  - `ecg_rr_tool/analysis.py`
-  - `ecg_rr_tool/export.py`
-- `tests/` 下与 M3 相关的测试；
-- `requirements.txt`；
-- `pyproject.toml`，仅限 Python 版本与必要依赖；
-- `docs/01_DECISION_LOG.md`，追加本轮已确认决策；
-- `docs/05_DETECTOR_STRATEGY.md`，记录 WFDB XQRS 已被 Owner 选为 M3 主 detector；
-- `docs/10_CODEX_NEXT_TASK.md`，任务完成后可更新为当前 M3 完成状态或下一步占位说明。
+- `ecg_rr_tool/export.py`
+- `ecg_rr_tool/io.py`，仅限错误提示或边界处理，不改变输入契约
+- `ecg_rr_tool/analysis.py`，仅限 summary / 返回信息组织，不改变算法策略
+- `tests/` 下与 M4 CLI / export / error handling 相关的测试
+- `docs/09_CODEX_RUNBOOK.md`
+- `docs/10_CODEX_NEXT_TASK.md`
+- `README.md`，如需要补充最小 CLI 示例
+- `.gitignore`，如需要确认 `outputs/` 产物不入仓库
+
+---
 
 ## 6. 不允许修改范围
 
@@ -88,207 +92,185 @@ M3：WFDB XQRS Detector Adapter 集成与 RR 输出。
 
 1. `docs/04_IO_CONTRACT.md` 中已确认的输出字段；
 2. 输入字段：`Time [s]`、` II` / `II`、` PLETH` / `PLETH`；
-3. 原始采样率：125 Hz；
-4. 目标输出采样率：50 Hz；
-5. R 峰检测时机：必须优先在 125 Hz 原始 ECG 上检测，再映射到 50 Hz 输出；
-6. 主 detector：WFDB XQRS；
-7. fallback 策略：不保留自研 fallback；
-8. 项目用途边界：不得写成医疗诊断软件；
-9. 示例 CSV 路径；
-10. GUI 范围。
+3. 原始采样率 125 Hz；
+4. 目标输出采样率 50 Hz；
+5. 主 detector：`wfdb_xqrs`；
+6. fallback 策略：不保留自研 fallback；
+7. Python 版本策略：Python 3.11+；
+8. 依赖版本，除非修复明确安装冲突且必须报告；
+9. GUI 范围；
+10. 项目用途边界。
 
-如果发现必须改变上述任何内容，必须暂停并在 Codex 输出中列为 S0 Owner 决策项。
+如果发现必须改变以上任何内容，必须暂停并在 Codex 输出中列为 S0 Owner 决策项。
 
-## 7. 依赖要求
+---
 
-1. 正式 runtime 依赖应以 WFDB XQRS 和必要的数值处理依赖为主。
-2. M2a 中用于评估的其他候选库不应继续作为正式 runtime 依赖保留，除非明确放入可选评估依赖并说明用途。
-3. 允许把 `pyproject.toml` 的 `requires-python` 更新为 `>=3.11`。
-4. 若新增依赖，必须写入 `requirements.txt` 和 / 或 `pyproject.toml`。
-5. 必须在 Codex 输出中记录关键依赖版本，至少包括：
-   - `wfdb`
-   - `numpy`
-   - `scipy`
-   - 其他实际新增依赖。
+## 7. CLI 体验要求
 
-## 8. Detector adapter 要求
-
-必须通过 adapter 封装 WFDB XQRS。
-
-建议实现：
-
-```text
-ecg_rr_tool/detectors/wfdb_detector.py
-```
-
-建议 detector 名称统一为：
-
-```text
-wfdb_xqrs
-```
-
-adapter 必须满足 `ecg_rr_tool.detectors.base.RPeakDetector` 接口，输出统一 `RPeakEvent`。
-
-要求：
-
-1. GUI、CLI、导出模块不得直接调用 WFDB API；
-2. 只有 `wfdb_detector.py` 可以直接调用 WFDB XQRS；
-3. `detectors/factory.py` 应支持创建 `wfdb_xqrs` detector；
-4. adapter 应记录 `detector_name` 和 `detector_version`；
-5. adapter 输入为 125 Hz 原始 ECG 序列；
-6. adapter 输出的 `r_peak_time_s` 应基于原始时间戳或 125 Hz 采样率换算；
-7. `rr_ms` 为相邻 R 峰时间差，单位 ms；
-8. 第一个 R 峰的 `rr_ms` 可为 `None`；
-9. `quality_flag` 最小可使用 `ok` / `unknown` / `error`。
-
-## 9. 输入处理要求
-
-示例 CSV 固定路径：
-
-```text
-tests/fixtures/bidmc_01_Signals_4000.csv
-```
-
-关键字段：
-
-- 时间戳：`Time [s]`
-- ECG：原始字段可能为 ` II`，逻辑字段为 `II`
-- PPG：原始字段可能为 ` PLETH`，逻辑字段为 `PLETH`
-
-读取规则：
-
-1. 对 CSV header 执行 `strip()` 后匹配；
-2. 如果 `strip()` 后出现重复逻辑字段，应报错，避免静默选错列；
-3. 必须校验必要字段存在；
-4. 必须校验时间戳单调递增；
-5. 必须估计采样率并确认约为 125 Hz；
-6. 如果字段缺失、采样率异常或时间戳异常，应返回清晰错误信息。
-
-## 10. 50 Hz 输出与 R 峰映射要求
-
-输出 CSV 必须按 50 Hz 采样点逐行组织。
-
-输出字段必须包含：
-
-```text
-time_s_50hz
-ecg_50hz
-ppg_50hz
-r_peak_sample_index
-r_peak_time_s
-rr_ms
-detector_name
-quality_flag
-```
-
-处理要求：
-
-1. ECG 与 PPG 从 125 Hz 同步降采样到 50 Hz；
-2. 推荐使用 `scipy.signal.resample_poly(up=2, down=5)` 处理 ECG 与 PPG；
-3. 50 Hz 时间戳应与输出序列长度一致；
-4. 推荐使用 `time_s_50hz = time_start + np.arange(n_out) / 50.0` 生成 50 Hz 时间戳，避免对时间戳做滤波引入偏移；
-5. R 峰检测仍在 125 Hz 原始 ECG 上完成；
-6. 将 `r_peak_time_s` 映射到 50 Hz 输出行，建议：
-
-```text
-mapped_index_50hz = round((r_peak_time_s - time_start) * 50.0)
-```
-
-7. `r_peak_sample_index` 在主输出 CSV 中表示映射后的 50 Hz 输出行索引；
-8. 非 R 峰行的 R 峰 / RR / detector / quality 字段应为空；
-9. R 峰行应填写 `r_peak_sample_index`、`r_peak_time_s`、`rr_ms`、`detector_name`、`quality_flag`；
-10. 不要新增 `hr_bpm` 或 HRV 字段。
-
-## 11. CLI 要求
-
-本轮可以实现最小 CLI 分析入口，用于 smoke test 和导出。
-
-建议命令形式：
+必须保留 M3 的基本命令形式：
 
 ```bash
-python -m ecg_rr_tool.cli tests/fixtures/bidmc_01_Signals_4000.csv outputs/m3_bidmc_01_result.csv
+python -m ecg_rr_tool.cli tests/fixtures/bidmc_01_Signals_4000.csv outputs/m4_bidmc_01_result.csv
 ```
 
-要求：
+必须保留：
 
-1. 保留 `python -m ecg_rr_tool.cli --version`；
-2. 输入 CSV 与输出 CSV 使用仓库相对路径；
-3. 默认 detector 为 `wfdb_xqrs`；
-4. CLI 运行后打印：
-   - 输入行数；
-   - 输出行数；
-   - 估计原始采样率；
-   - detector 名称；
-   - 检测到的 R 峰数量；
-   - RR 合理性摘要；
-   - 输出文件路径；
-5. 如果输出目录不存在，可以自动创建；
-6. CLI 不输出医疗诊断结论。
+```bash
+python -m ecg_rr_tool.cli --version
+python -m ecg_rr_tool.cli --about
+```
 
-## 12. 测试要求
+建议增强：
+
+1. `--help` 文案包含：用途边界、输入 CSV、输出 CSV、默认 detector、示例命令；
+2. 成功运行后继续输出稳定的 key-value summary，至少包括：
+   - `input_rows`
+   - `output_rows`
+   - `estimated_sampling_rate_hz`
+   - `detector_name`
+   - `detector_version`
+   - `r_peak_count`
+   - `rr_ms` 摘要
+   - `output_csv`
+3. 对以下错误给出清晰 stderr，不输出 traceback：
+   - 输入文件不存在；
+   - 缺失必要字段；
+   - 字段 strip 后重复；
+   - 时间戳非严格递增；
+   - 采样率不是约 125 Hz；
+   - detector 名称未知；
+   - 输出路径不可写或输出目录无法创建；
+4. 成功退出码为 `0`；工程 / 数据处理错误建议退出码为 `2`；argparse 用法错误可以保持默认行为；
+5. 不输出医疗诊断结论。
+
+可选增强，但不得破坏原有命令：
+
+- 增加 `--quiet`：只输出必要结果；
+- 增加 `--overwrite`：如果你决定保护已有输出文件不被覆盖，则必须提供该选项，并更新测试与 runbook；
+- 增加 `--detector wfdb_xqrs` 的明确测试。
+
+如果上述可选增强会导致复杂度变大，可以不做。
+
+---
+
+## 8. 导出体验要求
+
+1. 输出 CSV 字段顺序必须与 `ecg_rr_tool.analysis.OUTPUT_FIELDS` 保持一致；
+2. 输出 CSV 必须按 50 Hz 采样点逐行输出；
+3. 非 R 峰行的 R 峰 / RR / detector / quality 字段为空；
+4. R 峰行必须填充：
+   - `r_peak_sample_index`
+   - `r_peak_time_s`
+   - `rr_ms`，第一个 R 峰可以为空
+   - `detector_name`
+   - `quality_flag`
+5. 不新增 HR、HRV、医疗诊断字段；
+6. 输出目录可自动创建；
+7. 运行生成的 `outputs/*.csv` 不得提交入 PR。
+
+---
+
+## 9. 测试要求
 
 至少新增或更新以下测试：
 
-1. detector factory 能创建 `wfdb_xqrs`；
-2. WFDB adapter 在 fixture ECG 上能输出 R 峰事件；
-3. R 峰数量在 smoke test 合理范围内，建议 `45 <= n_peaks <= 55`；
-4. RR 范围基本合理，建议非空 RR 均在 `300-2000 ms` 内；
-5. 分析流程能生成 50 Hz 输出 CSV；
-6. 输出 CSV 字段完整且顺序合理；
-7. fixture 4000 行输入应生成约 1600 行 50 Hz 输出；
-8. R 峰行能填充 `r_peak_sample_index`、`r_peak_time_s`、`rr_ms`、`detector_name`、`quality_flag`；
-9. CLI smoke test 能运行并生成输出文件；
-10. 缺失必要字段时应有清晰错误。
+1. CLI `--help` 能正常运行，并包含核心关键词；
+2. CLI `--version` 能正常运行；
+3. CLI `--about` 能正常运行，并包含非医疗诊断边界说明；
+4. CLI fixture smoke：
+   - 输入 `tests/fixtures/bidmc_01_Signals_4000.csv`；
+   - 输出到临时目录或 `outputs/m4_bidmc_01_result.csv`；
+   - 检查退出码为 0；
+   - 检查输出 CSV 存在；
+   - 检查输出行数为 1600；
+   - 检查 R 峰数量在合理范围，建议 `45 <= n_peaks <= 55`；
+   - 检查 RR 均在 `300-2000 ms`；
+5. 缺失字段错误测试；
+6. 字段 strip 后重复错误测试；
+7. 时间戳非单调错误测试；
+8. 采样率异常错误测试；
+9. 未知 detector 错误测试；
+10. 输出目录自动创建测试；
+11. 确认 `outputs/*.csv` 不进入 git diff。
 
-## 13. 建议测试命令
+如果现有测试已覆盖部分内容，可以复用并补充，不要重复堆测试。
 
-请至少执行并报告以下命令。可根据项目实际结构补充命令，但不能省略核心 smoke test。
+---
+
+## 10. 文档要求
+
+更新 `docs/09_CODEX_RUNBOOK.md`，至少包含：
+
+1. 依赖安装说明；
+2. CLI 版本检查命令；
+3. CLI 分析 fixture 的命令；
+4. 输出 CSV 字段简述；
+5. 常见错误及含义；
+6. 明确说明 `outputs/` 是运行产物目录，不应提交结果 CSV；
+7. 明确说明本项目不是医疗诊断软件。
+
+如 README 已有 CLI 示例，可同步简短更新；不要写成长篇文档。
+
+---
+
+## 11. 建议测试命令
+
+请至少执行并报告以下命令：
 
 ```bash
 python -m pytest
 python -m ecg_rr_tool.cli --version
-python -m ecg_rr_tool.cli tests/fixtures/bidmc_01_Signals_4000.csv outputs/m3_bidmc_01_result.csv
+python -m ecg_rr_tool.cli --about
+python -m ecg_rr_tool.cli --help
+python -m ecg_rr_tool.cli tests/fixtures/bidmc_01_Signals_4000.csv outputs/m4_bidmc_01_result.csv
+git status --short
 git diff --check
 ```
 
-如果默认 Python 环境缺少依赖，应说明实际使用的 Python 解释器、依赖安装位置和完整测试命令。
+如果默认 Python 环境缺少依赖，请说明实际使用的 Python 解释器、依赖安装位置和完整测试命令。功能性验收以安装正式依赖后的环境为准。
 
-## 14. 通过标准
+运行 smoke test 后，如果生成了 `outputs/m4_bidmc_01_result.csv`，不要把它提交入 PR。
 
-M3 通过需要满足：
+---
 
-1. WFDB XQRS 已通过正式 adapter 封装；
-2. GUI / CLI / 导出模块没有直接散落调用 WFDB API；
-3. factory 能创建 `wfdb_xqrs`；
-4. 依赖文件记录正式依赖；
-5. 不再把全部 M2a 候选库都作为正式 runtime 依赖；
-6. 示例 CSV 使用仓库内相对路径；
-7. 能生成符合 IO Contract 的 50 Hz 输出 CSV；
-8. R 峰数量、RR 范围、输出行数、字段完整性通过 smoke test；
-9. 未新增 HR、HRV、医疗诊断字段；
-10. 未改变已确认输入 / 输出字段；
-11. 文档记录 Owner 已确认的 detector 决策；
-12. 测试命令真实执行并通过，或清楚说明失败原因。
+## 12. 通过标准
 
-## 15. 失败时应报告的信息
+M4 通过需要满足：
+
+1. CLI 保留 M3 基本命令形式；
+2. `--version`、`--about`、`--help` 可用；
+3. fixture CLI smoke test 通过；
+4. 输出 CSV 字段、字段顺序和行组织符合 IO Contract；
+5. 错误场景有清晰 stderr，不输出 traceback；
+6. 测试覆盖主要 CLI / export / error handling 场景；
+7. Runbook 已更新；
+8. 未改变 detector 策略、算法策略、IO Contract、依赖策略；
+9. PR 不包含 `outputs/*.csv` 运行产物；
+10. `git diff --check` 通过。
+
+---
+
+## 13. 失败时应报告的信息
 
 如果无法完成，请报告：
 
 1. 未满足的通过标准；
 2. 失败的测试命令；
 3. 关键错误日志；
-4. 是否是依赖安装、Python 版本、WFDB API、数据字段、采样率或实现问题；
+4. 是否是依赖环境、CLI、CSV 读取、导出、测试或文档问题；
 5. 是否需要 Owner 新增 S0 决策；
 6. 建议如何拆分下一轮任务。
 
-## 16. Codex 输出摘要要求
+---
+
+## 14. Codex 输出摘要要求
 
 完成后请输出：
 
 1. Summary；
 2. Changed files；
-3. Dependency changes and versions；
-4. Detector adapter location；
+3. 是否改变算法 / detector / IO Contract / 依赖版本；
+4. CLI 行为变化说明；
 5. Test commands；
 6. Test results；
 7. Fixture smoke test summary，包括：
@@ -302,17 +284,20 @@ M3 通过需要满足：
 9. Owner decision needed，如无请写“无”；
 10. 未完成事项。
 
-## 17. M3 完成记录
+---
+
+## 15. M4 完成记录
 
 状态：已完成。
 
 完成内容：
 
-1. 已实现 `wfdb_xqrs` 正式 detector adapter；
-2. 已实现 BIDMC CSV 读取、字段 `strip()` 匹配、采样率校验、50 Hz 同步降采样、R 峰映射和 CSV 导出；
-3. 已实现最小 CLI 分析入口；
-4. 已将正式 runtime 依赖收敛为 WFDB XQRS 相关依赖；
-5. 已新增 M3 smoke tests；
-6. 已基于 `tests/fixtures/bidmc_01_Signals_4000.csv` 生成 `outputs/m3_bidmc_01_result.csv`。
+1. 已完善 CLI `--help`、`--version`、`--about` 和 fixture 分析命令体验；
+2. 已补充输入文件不存在、缺字段、字段 strip 后重复、时间戳异常、采样率异常、未知 detector 等错误场景的清晰 stderr；
+3. 已确认输出 CSV 字段和顺序仍由 `ecg_rr_tool.analysis.OUTPUT_FIELDS` 控制；
+4. 已确认输出目录可自动创建；
+5. 已确认 `outputs/*.csv` 运行产物不进入 PR；
+6. 已更新 Runbook 和 README 的最小 CLI 使用说明；
+7. 已新增 M4 CLI / export / error handling 测试。
 
-下一步占位：M4 可继续完善 CLI 与导出结果体验、错误处理和回归测试。
+下一步占位：M5 可进入最小 GUI 与波形可视化。

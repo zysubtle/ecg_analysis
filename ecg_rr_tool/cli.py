@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+import textwrap
 from pathlib import Path
 
 from ecg_rr_tool import __version__
@@ -12,9 +13,19 @@ from ecg_rr_tool import __version__
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="ecg-rr",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
         description=(
             "Desktop ECG RR engineering analysis tool. "
             "This tool is not medical diagnostic software."
+        ),
+        epilog=textwrap.dedent(
+            """\
+            Input CSV columns are matched after strip(): Time [s], II, PLETH.
+            Default detector: wfdb_xqrs.
+
+            Example:
+              python -m ecg_rr_tool.cli tests/fixtures/bidmc_01_Signals_4000.csv outputs/m4_bidmc_01_result.csv
+            """
         ),
     )
     parser.add_argument("--version", action="version", version=f"ecg-rr-tool {__version__}")
@@ -29,7 +40,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Detector adapter name. Default: wfdb_xqrs.",
     )
     parser.add_argument("input_csv", nargs="?", help="Input BIDMC CSV path.")
-    parser.add_argument("output_csv", nargs="?", help="Output CSV path.")
+    parser.add_argument("output_csv", nargs="?", help="Output IO Contract CSV path.")
     return parser
 
 
