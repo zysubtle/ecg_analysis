@@ -36,7 +36,7 @@ ecg_rr_tool/detectors/heartpy_detector.py
 ecg_rr_tool/detectors/factory.py
 ```
 
-当前 M1 仅创建最小接口骨架，不集成具体第三方库。
+当前 M3-M6 已按 Owner 决策集成 `wfdb_xqrs`，正式业务流程通过 adapter 使用 WFDB XQRS。
 
 ## 不允许事项
 
@@ -81,3 +81,11 @@ wfdb_xqrs
 ```
 
 正式集成必须通过 `ecg_rr_tool/detectors/wfdb_detector.py` adapter 封装。GUI、CLI、导出模块不得直接调用 WFDB API。当前策略仍为不保留自研 fallback。
+
+## M6 状态与风险
+
+- 当前正式主 detector：`wfdb_xqrs`。
+- 当前不保留自研 fallback。
+- 当前 smoke test 仅基于 `tests/fixtures/bidmc_01_Signals_4000.csv`，不能证明总体准确性或临床有效性。
+- 无参考标注，不能计算准确率、召回率或 F1。
+- 若 WFDB XQRS 在目标环境安装、打包或运行失败，当前版本应报告错误，不应静默切换到其他 detector 或自研算法。

@@ -74,7 +74,7 @@ python -m ecg_rr_tool.cli --about
 分析 fixture 并导出 CSV：
 
 ```bash
-python -m ecg_rr_tool.cli tests/fixtures/bidmc_01_Signals_4000.csv outputs/m4_bidmc_01_result.csv
+python -m ecg_rr_tool.cli tests/fixtures/bidmc_01_Signals_4000.csv outputs/example_result.csv
 ```
 
 成功运行后 CLI 输出 key-value summary，包括输入行数、输出行数、估计采样率、detector 名称和版本、R 峰数量、RR 摘要和输出路径。
@@ -141,6 +141,24 @@ python -m ecg_rr_tool.cli --version
 ```
 
 M1 不要求完整算法运行。
+
+## M6 验收命令
+
+默认环境若未安装正式 runtime 依赖，功能性验收应在 Python 3.11+ 且已安装 `requirements.txt` / `pyproject.toml` 依赖的环境中执行。
+
+```bash
+python -m pytest
+python -m ecg_rr_tool.cli --version
+python -m ecg_rr_tool.cli --about
+python -m ecg_rr_tool.gui --help
+python -m ecg_rr_tool.gui --self-test tests/fixtures/bidmc_01_Signals_4000.csv
+python -m ecg_rr_tool.cli tests/fixtures/bidmc_01_Signals_4000.csv outputs/m6_cli_smoke.csv
+git check-ignore --no-index outputs/m6_cli_smoke.csv
+git diff --check
+git status --short
+```
+
+执行 smoke test 后应删除 `outputs/m6_cli_smoke.csv`，不得提交运行产物。
 
 ## 后续算法类任务的测试要求
 

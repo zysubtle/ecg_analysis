@@ -64,3 +64,18 @@
 - 决策：暂不补充带参考标注的数据集，当前仍只基于 `tests/fixtures/bidmc_01_Signals_4000.csv` 做 smoke test 与工程合理性检查。
 - 决策人：Owner。
 - 状态：已确认。
+
+## D008｜M5 GUI 技术栈
+
+- 决策：M5 最小 GUI 采用 Tkinter + Canvas。
+- 决策：M5 不新增 PySide6、matplotlib 或其他 GUI / 绘图库依赖。
+- 决策：GUI 仍调用既有 analysis / export 流程，不直接调用 WFDB API。
+- 决策人：Owner。
+- 状态：已确认。
+
+## D009｜M6 验收边界
+
+- 决策：M6 仅做验收、文档收敛与风险复盘。
+- 决策：M6 不修改算法逻辑、detector、IO Contract 字段、依赖版本或 GUI 技术栈。
+- 决策人：Owner。
+- 状态：已确认。

@@ -6,7 +6,7 @@
 
 ## 当前状态
 
-当前包已推进到 **M5：最小 GUI 与波形可视化**，包含：
+当前包已推进到 **M6：验收、文档收敛与风险复盘**，包含：
 
 - 项目文档；
 - IO Contract；
@@ -25,7 +25,7 @@
 ```bash
 python -m ecg_rr_tool.cli --version
 python -m ecg_rr_tool.cli --about
-python -m ecg_rr_tool.cli tests/fixtures/bidmc_01_Signals_4000.csv outputs/m4_bidmc_01_result.csv
+python -m ecg_rr_tool.cli tests/fixtures/bidmc_01_Signals_4000.csv outputs/example_result.csv
 ```
 
 `outputs/` 是运行产物目录，导出的 CSV 不应提交。
@@ -57,10 +57,6 @@ tests/fixtures/bidmc_01_Signals_4000.csv
 
 ## 建议下一步
 
-将本项目包解压并放入 GitHub 仓库后，让 Codex 执行：
+当前项目已完成 M1-M5 功能里程碑和 M6 文档验收。后续如继续迭代，应基于 `docs/07_ACCEPTANCE_REPORT.md` 与 `docs/08_RISK_REVIEW.md` 中记录的限制和风险拆分新任务。
 
-```text
-请读取 docs/10_CODEX_NEXT_TASK.md，并严格执行。
-```
-
-当前 `docs/10_CODEX_NEXT_TASK.md` 对应最新里程碑任务。
+当前 `docs/10_CODEX_NEXT_TASK.md` 对应 M6 验收任务与完成记录。
