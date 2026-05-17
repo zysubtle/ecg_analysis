@@ -6,17 +6,28 @@
 
 ## 当前状态
 
-当前包为 **M1：项目启动包**，包含：
+当前包已推进到 **M4：CLI 与导出体验完善**，包含：
 
 - 项目文档；
 - IO Contract；
 - detector 策略说明；
 - Codex / Agent 协作规则；
-- 最小 Python 项目骨架；
-- 示例 CSV fixture；
-- M2a 第三方 R 峰检测库评估任务文件。
+- WFDB XQRS detector adapter；
+- BIDMC CSV 读取、125 Hz 校验、50 Hz 输出和 RR 导出流程；
+- 最小 CLI；
+- 示例 CSV fixture。
 
-当前包不包含完整 R 峰检测算法、不集成第三方 detector、不实现完整 GUI。
+当前包不实现完整 GUI，不做 HR / HRV、PPG IBI、批量处理或临床准确性声明。
+
+## CLI 示例
+
+```bash
+python -m ecg_rr_tool.cli --version
+python -m ecg_rr_tool.cli --about
+python -m ecg_rr_tool.cli tests/fixtures/bidmc_01_Signals_4000.csv outputs/m4_bidmc_01_result.csv
+```
+
+`outputs/` 是运行产物目录，导出的 CSV 不应提交。
 
 ## 示例数据
 
@@ -42,4 +53,4 @@ tests/fixtures/bidmc_01_Signals_4000.csv
 请读取 docs/10_CODEX_NEXT_TASK.md，并严格执行。
 ```
 
-当前 `docs/10_CODEX_NEXT_TASK.md` 对应 **M2a：第三方 R 峰检测库评估与选型**。
+当前 `docs/10_CODEX_NEXT_TASK.md` 对应最新里程碑任务。

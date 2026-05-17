@@ -43,6 +43,68 @@ CSV 关键字段：
 
 读取时应对字段名执行 `strip()` 后匹配。
 
+## 依赖安装
+
+建议使用 Python 3.11+。
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e .
+python -m pip install pytest
+```
+
+当前正式 runtime detector 为 `wfdb_xqrs`，依赖版本记录在 `requirements.txt` / `pyproject.toml`。
+
+## CLI 使用
+
+版本检查：
+
+```bash
+python -m ecg_rr_tool.cli --version
+```
+
+项目用途边界说明：
+
+```bash
+python -m ecg_rr_tool.cli --about
+```
+
+分析 fixture 并导出 CSV：
+
+```bash
+python -m ecg_rr_tool.cli tests/fixtures/bidmc_01_Signals_4000.csv outputs/m4_bidmc_01_result.csv
+```
+
+成功运行后 CLI 输出 key-value summary，包括输入行数、输出行数、估计采样率、detector 名称和版本、R 峰数量、RR 摘要和输出路径。
+
+输出 CSV 字段固定为：
+
+```text
+time_s_50hz
+ecg_50hz
+ppg_50hz
+r_peak_sample_index
+r_peak_time_s
+rr_ms
+detector_name
+quality_flag
+```
+
+`outputs/` 是运行产物目录，`outputs/*.csv` 不应提交到 PR。
+
+常见错误：
+
+- `Input CSV does not exist`：输入路径不存在；
+- `Missing required columns after strip()`：缺少 `Time [s]`、`II` 或 `PLETH`；
+- `Duplicate CSV columns after strip()`：字段名去除空格后重复；
+- `Timestamps must be strictly increasing`：时间戳不是严格递增；
+- `Estimated sampling rate must be approximately 125 Hz`：输入采样率不符合当前契约；
+- `Unknown detector`：传入了未支持的 detector 名称。
+
+本项目仅为研究 / 工程分析工具，不作为医疗诊断软件，不输出医疗诊断结论。
+
 ## M1 最小测试命令
 
 ```bash

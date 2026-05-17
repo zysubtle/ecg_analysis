@@ -33,6 +33,11 @@ class BidmcSignals:
 
 def read_bidmc_csv(path: str | Path) -> BidmcSignals:
     csv_path = Path(path)
+    if not csv_path.exists():
+        raise InputDataError(f"Input CSV does not exist: {csv_path}")
+    if not csv_path.is_file():
+        raise InputDataError(f"Input path is not a file: {csv_path}")
+
     with csv_path.open(newline="") as f:
         reader = csv.DictReader(f)
         if reader.fieldnames is None:

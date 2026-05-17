@@ -1,4 +1,4 @@
-"""Minimal ECG analysis flow for M3."""
+"""Minimal ECG analysis flow."""
 
 from __future__ import annotations
 
