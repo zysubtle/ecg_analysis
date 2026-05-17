@@ -10,7 +10,7 @@ Owner 给 Codex 的默认指令：
 
 ## 环境建议
 
-建议使用 Python 3.10+。
+建议使用 Python 3.11+。
 
 初始化环境示例：
 
@@ -104,6 +104,34 @@ quality_flag
 - `Unknown detector`：传入了未支持的 detector 名称。
 
 本项目仅为研究 / 工程分析工具，不作为医疗诊断软件，不输出医疗诊断结论。
+
+## GUI 使用
+
+M5 最小 GUI 使用 Tkinter + Canvas，不新增 PySide6、matplotlib 或其他 GUI / 绘图库依赖。
+
+启动 GUI：
+
+```bash
+python -m ecg_rr_tool.gui
+```
+
+GUI 支持：
+
+- 选择 BIDMC CSV；
+- 填写或选择输出 CSV；
+- 调用现有 `analyze_csv()` / `write_output_csv()` 流程；
+- 显示 50 Hz ECG 波形；
+- 标记 R 峰；
+- 显示基础分析摘要；
+- 导出符合 IO Contract 的 CSV。
+
+无显示环境自检：
+
+```bash
+python -m ecg_rr_tool.gui --self-test tests/fixtures/bidmc_01_Signals_4000.csv
+```
+
+GUI 与 self-test 仍只作为研究 / 工程分析工具使用，不作为医疗诊断软件。GUI 不直接调用 WFDB API，正式 detector 仍通过 adapter 和 analysis 层使用。
 
 ## M1 最小测试命令
 

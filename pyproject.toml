@@ -19,6 +19,7 @@ dev = ["pytest>=7"]
 
 [project.scripts]
 ecg-rr = "ecg_rr_tool.cli:main"
+ecg-rr-gui = "ecg_rr_tool.gui:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
