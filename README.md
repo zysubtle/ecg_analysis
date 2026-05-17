@@ -6,7 +6,7 @@
 
 ## 当前状态
 
-当前包已推进到 **M4：CLI 与导出体验完善**，包含：
+当前包已推进到 **M5：最小 GUI 与波形可视化**，包含：
 
 - 项目文档；
 - IO Contract；
@@ -15,9 +15,10 @@
 - WFDB XQRS detector adapter；
 - BIDMC CSV 读取、125 Hz 校验、50 Hz 输出和 RR 导出流程；
 - 最小 CLI；
+- Tkinter + Canvas 最小 GUI；
 - 示例 CSV fixture。
 
-当前包不实现完整 GUI，不做 HR / HRV、PPG IBI、批量处理或临床准确性声明。
+当前包不做 HR / HRV、PPG IBI、批量处理、复杂 GUI 交互、人工编辑 R 峰或临床准确性声明。
 
 ## CLI 示例
 
@@ -28,6 +29,15 @@ python -m ecg_rr_tool.cli tests/fixtures/bidmc_01_Signals_4000.csv outputs/m4_bi
 ```
 
 `outputs/` 是运行产物目录，导出的 CSV 不应提交。
+
+## GUI 示例
+
+```bash
+python -m ecg_rr_tool.gui
+python -m ecg_rr_tool.gui --self-test tests/fixtures/bidmc_01_Signals_4000.csv
+```
+
+GUI 使用 Tkinter + Canvas，可选择输入 CSV、填写输出路径、运行分析、显示 50 Hz ECG 波形并标记 R 峰。`--self-test` 不创建窗口，适合无显示环境 smoke test。
 
 ## 示例数据
 
