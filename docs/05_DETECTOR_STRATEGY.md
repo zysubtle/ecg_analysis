@@ -71,3 +71,13 @@ M2a 第三方库评估结果记录在：
 ```text
 docs/06_THIRD_PARTY_EVAL.md
 ```
+
+## M3 已确认主 detector
+
+Owner 已确认 M3 正式主 detector 为：
+
+```text
+wfdb_xqrs
+```
+
+正式集成必须通过 `ecg_rr_tool/detectors/wfdb_detector.py` adapter 封装。GUI、CLI、导出模块不得直接调用 WFDB API。当前策略仍为不保留自研 fallback。

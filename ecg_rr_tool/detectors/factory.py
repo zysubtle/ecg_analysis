@@ -1,16 +1,16 @@
-"""Detector factory scaffold."""
+"""Detector factory."""
 
 from __future__ import annotations
 
 from ecg_rr_tool.detectors.base import RPeakDetector
 
 
-def create_detector(name: str) -> RPeakDetector:
-    """Create a detector adapter by name.
+def create_detector(name: str = "wfdb_xqrs") -> RPeakDetector:
+    """Create a detector adapter by name."""
+    normalized = name.strip().lower().replace("-", "_")
+    if normalized in {"wfdb_xqrs", "wfdb", "xqrs"}:
+        from ecg_rr_tool.detectors.wfdb_detector import WFDBXQRSDetector
 
-    Concrete detector adapters are selected after M2a and implemented in M3.
-    """
-    raise NotImplementedError(
-        f"Detector '{name}' is not implemented in M1. "
-        "Run M2a evaluation first, then implement the selected adapter in M3."
-    )
+        return WFDBXQRSDetector()
+
+    raise ValueError(f"Unknown detector: {name}")

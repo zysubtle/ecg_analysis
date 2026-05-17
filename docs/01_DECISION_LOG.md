@@ -55,3 +55,12 @@
 - 决策：M1 不实现完整算法、不集成第三方库、不做完整 GUI。
 - 决策人：Owner。
 - 状态：已确认。
+
+## D007｜M3 主 detector
+
+- 决策：M3 正式主 detector 采用 WFDB XQRS。
+- 决策：继续保持不保留自研 fallback。
+- 决策：最终运行环境允许 Python 3.11+，不强制兼容 Python 3.10。
+- 决策：暂不补充带参考标注的数据集，当前仍只基于 `tests/fixtures/bidmc_01_Signals_4000.csv` 做 smoke test 与工程合理性检查。
+- 决策人：Owner。
+- 状态：已确认。

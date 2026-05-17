@@ -1,8 +1,4 @@
-"""Detector interface scaffold.
-
-M1 defines the shape of the future adapter layer but does not integrate any
-third-party detector.
-"""
+"""Detector adapter interface."""
 
 from __future__ import annotations
 
@@ -29,6 +25,11 @@ class RPeakDetector(Protocol):
     name: str
     version: str | None
 
-    def detect(self, ecg: Sequence[float], sampling_rate_hz: float) -> list[RPeakEvent]:
+    def detect(
+        self,
+        ecg: Sequence[float],
+        sampling_rate_hz: float,
+        start_time_s: float = 0.0,
+    ) -> list[RPeakEvent]:
         """Detect R peaks from one ECG sequence."""
         ...
