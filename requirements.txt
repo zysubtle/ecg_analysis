@@ -1,2 +1,9 @@
-# M1 scaffold has no mandatory runtime dependencies.
-# M2a may add candidate detector libraries after evaluation.
+# M2a temporary detector evaluation dependencies.
+# These are not final product/runtime detector choices until Owner approves M2a.
+neurokit2==0.2.13
+wfdb==4.3.1
+biosppy==2.2.4
+sleepecg==0.5.9
+heartpy==1.2.7
+scipy==1.17.1
+numpy==2.4.5
